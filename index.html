@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Encuesta Nivel Secundario</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0; padding: 0;
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      color: #333;
+    }
+    .container {
+      width: 100%; max-width: 500px;
+      background: #fff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    h2 {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      color: #444;
+    }
+    .option {
+      display: block;
+      margin: 10px 0;
+      padding: 14px;
+      border: 2px solid #2575fc;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    .option:hover {
+      background: #2575fc;
+      color: white;
+    }
+    input[type="text"] {
+      width: 100%; padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      font-size: 1rem;
+    }
+    button {
+      margin-top: 15px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+      color: white;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      opacity: 0.9;
+      transform: scale(1.05);
+    }
+    .progress-bar {
+      height: 8px;
+      background: #ddd;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .progress {
+      height: 8px;
+      background: linear-gradient(135deg, #2575fc, #6a11cb);
+      width: 0;
+      transition: width 0.4s ease;
+    }
+    .spinner {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+    .spinner div {
+      width: 16px;
+      height: 16px;
+      margin: 0 4px;
+      background: #2575fc;
+      border-radius: 50%;
+      animation: bounce 0.6s infinite alternate;
+    }
+    .spinner div:nth-child(2) { animation-delay: 0.2s; }
+    .spinner div:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bounce {
+      to { transform: translateY(-12px); opacity: 0.7; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Encuesta sobre Ludopatía</h1>
+    <div style="text-align:right; margin-bottom:10px;">
+      <label for="lang">Idioma:</label>
+      <select id="lang" onchange="cambiarIdioma(this.value)">
+        <option value="es">Español</option>
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+      </select>
+    </div>
+    <div class="progress-bar"><div id="progress" class="progress"></div></div>
+    <div id="quiz"></div>
+  </div>
+
+  <script>
+    // 🔹 Preguntas incrustadas
+    const questions = [
+      { "pregunta": "1. Edad: seleccionar rango", "tipo": "opcion", "opciones": ["12 – 13", "14 – 15", "16 – 18"] },
+      { "pregunta": "2. Género", "tipo": "opcion", "opciones": ["Femenino", "Masculino", "Prefiero no responder", "Otro"] },
+      { "pregunta": "3. ¿Has apostado en línea alguna vez?", "tipo": "opcion", "opciones": ["Sí", "No"] },
+      { "pregunta": "4. ¿Con qué frecuencia sueles apostar?", "tipo": "opcion", "opciones": ["Todos los días", "4 a 6 días por semana", "2 a 3 días por semana", "1 vez por semana", "Menos de 1 vez por semana"] },
+      { "pregunta": "5. ¿Cuántas horas en promedio dedicas a apostar en un día que lo haces?", "tipo": "opcion", "opciones": ["Menos de 1 hora", "1 a 2 horas", "2 a 3 horas", "Más de 3 horas"] },
+      { "pregunta": "6. ¿Qué días de la semana sueles apostar?", "tipo": "multiple", "opciones": ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"] },
+      { "pregunta": "7. ¿En qué tipo de actividades apuestas?", "tipo": "multiple", "opciones": ["Casino online", "Apuestas deportivas", "Póker u otros juegos de cartas", "Juegos de azar (ruleta, tragamonedas, etc.)", "Otro"] },
+      { "pregunta": "8. ¿En qué plataformas o aplicaciones lo haces?", "tipo": "texto" },
+      { "pregunta": "9. ¿Los sitios de apuestas son oficiales (.bet)?", "tipo": "opcion", "opciones": ["Sí", "No", "No sé"] },
+      { "pregunta": "10. ¿De dónde obtienes el dinero para apostar?", "tipo": "opcion", "opciones": ["Dinero de padres", "Trabajo propio", "Préstamo de amigos o familiares", "Otros"] },
+      { "pregunta": "11. ¿Cuánto dinero sueles apostar en una semana?", "tipo": "opcion", "opciones": ["Menos de $1.000", "Entre $1.000 y $5.000", "Entre $5.000 y $10.000", "Más de $10.000"] },
+      { "pregunta": "12. ¿Tus padres o tutores saben que apuestas?", "tipo": "opcion", "opciones": ["Sí", "No", "No estoy seguro"] },
+      { "pregunta": "13. ¿Cómo conociste las apuestas online?", "tipo": "opcion", "opciones": ["Redes sociales", "Amigos", "Publicidad", "Otro"] },
+      { "pregunta": "14. ¿Por qué apuestas?", "tipo": "multiple", "opciones": ["Diversión", "Para ganar dinero", "Para pasar el tiempo", "Porque mis amigos lo hacen", "Otro"] },
+      { "pregunta": "15. ¿Conoces los riesgos de apostar?", "tipo": "opcion", "opciones": ["Sí", "No"] },
+      { "pregunta": "16. ¿Sabes a dónde acudir o qué hacer si tuvieras un problema con las apuestas?", "tipo": "opcion", "opciones": ["Sí", "No"] },
+      { "pregunta": "17. ¿Conoces a alguien que apueste en línea?", "tipo": "opcion", "opciones": ["Sí", "No"] },
+      { "pregunta": "18. ¿Alguna vez alguien te recomendó apostar?", "tipo": "opcion", "opciones": ["Sí", "No"] },
+      { "pregunta": "19. ¿Te gustaría apostar alguna vez?", "tipo": "opcion", "opciones": ["Sí", "No", "No estoy seguro"] },
+      { "pregunta": "20. ¿Conoces los riesgos de apostar?", "tipo": "opcion", "opciones": ["Sí", "No", "Un poco"] },
+      { "pregunta": "21. ¿Sabes a dónde acudir o qué hacer si tuvieras un problema con las apuestas?", "tipo": "opcion", "opciones": ["Sí", "No"] },
+      { "pregunta": "22. ¿Has visto publicidad de apuestas online en redes sociales o internet?", "tipo": "opcion", "opciones": ["Sí, muchas veces", "Algunas veces", "Nunca"] },
+      { "pregunta": "23. ¿Alguna vez gastaste dinero en un juego (ejemplo: para conseguir monedas, vidas o recompensas)?", "tipo": "opcion", "opciones": ["Sí", "No"] }
+    ];
+
+    let currentQuestion = 0;
+    let answers = {};
+    let multiAnswers = {};
+
+    // Traducciones de preguntas y opciones
+    const traducciones = {
+      en: [
+        { pregunta: "1. Age: select range", opciones: ["12 – 13", "14 – 15", "16 – 18"] },
+        { pregunta: "2. Gender", opciones: ["Female", "Male", "Prefer not to say", "Other"] },
+        { pregunta: "3. Have you ever bet online?", opciones: ["Yes", "No"] },
+        { pregunta: "4. How often do you usually bet?", opciones: ["Every day", "4 to 6 days a week", "2 to 3 days a week", "Once a week", "Less than once a week"] },
+        { pregunta: "5. On average, how many hours do you spend betting on a day you do it?", opciones: ["Less than 1 hour", "1 to 2 hours", "2 to 3 hours", "More than 3 hours"] },
+        { pregunta: "6. Which days of the week do you usually bet?", opciones: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] },
+        { pregunta: "7. What types of activities do you bet on?", opciones: ["Online casino", "Sports betting", "Poker or other card games", "Games of chance (roulette, slots, etc.)", "Other"] },
+        { pregunta: "8. On which platforms or apps do you do it?", opciones: null },
+        { pregunta: "9. Are the betting sites official (.bet)?", opciones: ["Yes", "No", "I don't know"] },
+        { pregunta: "10. Where do you get the money to bet?", opciones: ["Parents' money", "Own work", "Loan from friends or family", "Others"] },
+        { pregunta: "11. How much money do you usually bet in a week?", opciones: ["Less than $1,000", "Between $1,000 and $5,000", "Between $5,000 and $10,000", "More than $10,000"] },
+        { pregunta: "12. Do your parents or guardians know you bet?", opciones: ["Yes", "No", "I'm not sure"] },
+        { pregunta: "13. How did you learn about online betting?", opciones: ["Social networks", "Friends", "Advertising", "Other"] },
+        { pregunta: "14. Why do you bet?", opciones: ["Fun", "To earn money", "To pass the time", "Because my friends do it", "Other"] },
+        { pregunta: "15. Do you know the risks of betting?", opciones: ["Yes", "No"] },
+        { pregunta: "16. Do you know where to go or what to do if you had a problem with betting?", opciones: ["Yes", "No"] },
+        { pregunta: "17. Do you know anyone who bets online?", opciones: ["Yes", "No"] },
+        { pregunta: "18. Has anyone ever recommended you to bet?", opciones: ["Yes", "No"] },
+        { pregunta: "19. Would you like to bet someday?", opciones: ["Yes", "No", "I'm not sure"] },
+        { pregunta: "20. Do you know the risks of betting?", opciones: ["Yes", "No", "A little"] },
+        { pregunta: "21. Do you know where to go or what to do if you had a problem with betting?", opciones: ["Yes", "No"] },
+        { pregunta: "22. Have you ever seen online betting ads on social networks or the internet?", opciones: ["Yes, many times", "Sometimes", "Never"] },
+        { pregunta: "23. Have you ever spent money on a game (e.g., to get coins, lives or rewards)?", opciones: ["Yes", "No"] }
+      ],
+      zh: [
+        { pregunta: "1. 年龄：请选择范围", opciones: ["12 – 13", "14 – 15", "16 – 18"] },
+        { pregunta: "2. 性别", opciones: ["女性", "男性", "不想回答", "其他"] },
+        { pregunta: "3. 你曾经在线上赌博过吗？", opciones: ["是", "否"] },
+        { pregunta: "4. 你通常多久赌博一次？", opciones: ["每天", "每周4-6天", "每周2-3天", "每周1次", "每周不到1次"] },
+        { pregunta: "5. 你在赌博的那天平均花多少小时？", opciones: ["少于1小时", "1到2小时", "2到3小时", "超过3小时"] },
+        { pregunta: "6. 你通常在哪些星期几赌博？", opciones: ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"] },
+        { pregunta: "7. 你参与哪些类型的赌博活动？", opciones: ["在线赌场", "体育博彩", "扑克或其他纸牌游戏", "机会游戏（轮盘、老虎机等）", "其他"] },
+        { pregunta: "8. 你在哪些平台或应用上进行赌博？", opciones: null },
+        { pregunta: "9. 这些赌博网站是官方的吗（.bet）？", opciones: ["是", "否", "不知道"] },
+        { pregunta: "10. 你从哪里获得赌博资金？", opciones: ["父母的钱", "自己工作", "朋友或家人借款", "其他"] },
+        { pregunta: "11. 你一周通常赌博多少钱？", opciones: ["少于$1,000", "$1,000-$5,000", "$5,000-$10,000", "超过$10,000"] },
+        { pregunta: "12. 你的父母或监护人知道你赌博吗？", opciones: ["是", "否", "不确定"] },
+        { pregunta: "13. 你是如何了解线上赌博的？", opciones: ["社交网络", "朋友", "广告", "其他"] },
+        { pregunta: "14. 你为什么赌博？", opciones: ["娱乐", "赚钱", "打发时间", "因为朋友也赌博", "其他"] },
+        { pregunta: "15. 你知道赌博的风险吗？", opciones: ["是", "否"] },
+        { pregunta: "16. 如果你在赌博中遇到问题，你知道该去哪里或该怎么办吗？", opciones: ["是", "否"] },
+        { pregunta: "17. 你认识有人在线赌博吗？", opciones: ["是", "否"] },
+        { pregunta: "18. 有人曾经推荐你赌博吗？", opciones: ["是", "否"] },
+        { pregunta: "19. 你想过有一天去赌博吗？", opciones: ["是", "否", "不确定"] },
+        { pregunta: "20. 你知道赌博的风险吗？", opciones: ["是", "否", "有一点"] },
+        { pregunta: "21. 如果你在赌博中遇到问题，你知道该去哪里或该怎么办吗？", opciones: ["是", "否"] },
+        { pregunta: "22. 你在社交网络或互联网上见过线上赌博广告吗？", opciones: ["是，经常", "有时", "从未"] },
+        { pregunta: "23. 你曾经在游戏中花钱吗（例如：购买金币、生命或奖励）？", opciones: ["是", "否"] }
+      ]
+    };
+
+    let idioma = "es"; // idioma actual
+
+    function cambiarIdioma(lang) {
+      idioma = lang;
+      renderQuestion(questions, currentQuestion);
+    }
+
+    function updateProgress() {
+      let percent = ((currentQuestion) / questions.length) * 100;
+      document.getElementById("progress").style.width = percent + "%";
+    }
+
+    function renderQuestion(questions, index) {
+      if (index >= questions.length) {
+        enviarRespuestas();
+        return;
+      }
+
+      updateProgress();
+
+      // Selecciona el texto según idioma
+      let q = questions[index];
+      let qTrad = idioma === "es" ? q : traducciones[idioma][index];
+      let html = `<h2>${qTrad.pregunta}</h2>`;
+
+      if (q.tipo === "opcion") {
+        q.opciones.forEach((opt, i) => {
+          // Mostrar traducción pero guardar respuesta en español
+          let optTrad = idioma === "es" ? opt : traducciones[idioma][index].opciones[i];
+          html += `<div class="option" onclick="next(${index}, '${opt.replace(/'/g,"\\'")}', questions)">${optTrad}</div>`;
+        });
+      } else if (q.tipo === "multiple") {
+        q.opciones.forEach((opt, i) => {
+          let optTrad = idioma === "es" ? opt : traducciones[idioma][index].opciones[i];
+          html += `<label class="option">
+            <input type="checkbox" value="${opt.replace(/'/g,"\\'")}" onchange="saveMultiple(${index}, this.value, this.checked)">
+            ${optTrad}
+          </label>`;
+        });
+        html += `<button onclick="nextMultiple(${index}, questions)">${idioma === "zh" ? "下一步" : idioma === "en" ? "Next" : "Siguiente"}</button>`;
+      } else if (q.tipo === "texto") {
+        html += `<input type="text" id="text${index}" placeholder="${idioma === "zh" ? "请输入你的答案" : idioma === "en" ? "Type your answer" : "Escribe tu respuesta"}">`;
+        html += `<button onclick="nextText(${index}, questions)">${idioma === "zh" ? "下一步" : idioma === "en" ? "Next" : "Siguiente"}</button>`;
+      }
+
+      document.getElementById("quiz").innerHTML = html;
+    }
+
+    function next(index, answer, questions) {
+      answers[index+1] = answer;
+      currentQuestion++;
+      renderQuestion(questions, currentQuestion);
+    }
+
+    function saveMultiple(index, value, checked) {
+      if (!multiAnswers[index]) multiAnswers[index] = [];
+      if (checked) multiAnswers[index].push(value);
+      else multiAnswers[index] = multiAnswers[index].filter(v => v !== value);
+    }
+
+    function nextMultiple(index, questions) {
+      answers[index+1] = multiAnswers[index] || [];
+      currentQuestion++;
+      renderQuestion(questions, currentQuestion);
+    }
+
+    function nextText(index, questions) {
+      const val = document.getElementById("text"+index).value;
+      answers[index+1] = val;
+      currentQuestion++;
+      renderQuestion(questions, currentQuestion);
+    }
+
+    function enviarRespuestas() {
+      document.getElementById("quiz").innerHTML =
+        `<h2>${idioma === "zh" ? "正在提交答案..." : idioma === "en" ? "Sending answers..." : "Enviando respuestas..."}</h2>
+        <div class="spinner">
+          <div></div><div></div><div></div>
+        </div>`;
+
+      fetch("http://localhost:5678/webhook-test/621bf7b4-bb31-4b51-a306-b82c22a7ebfb", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(answers)
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Error en la respuesta del servidor");
+        return res.json();
+      })
+      .then(data => {
+        document.getElementById("quiz").innerHTML =
+          `<h2>${idioma === "zh" ? "感谢您的参与！" : idioma === "en" ? "Thank you for your response! 🎉" : "¡Gracias por responder! 🎉"}</h2>
+          <p>${idioma === "zh" ? "您的回答已成功提交。" : idioma === "en" ? "Your participation was successfully recorded." : "Tu participación fue registrada con éxito."}</p>`;
+      })
+      .catch(err => {
+        console.error("Error al enviar:", err);
+        document.getElementById("quiz").innerHTML =
+          `<h2>${idioma === "zh" ? "提交失败" : idioma === "en" ? "Submission failed" : "Hubo un error al enviar los datos 😢"}</h2>
+          <p>${idioma === "zh" ? "请稍后再试。" : idioma === "en" ? "Please try again later." : "Intenta más tarde."}</p>`;
+      });
+    }
+
+    // iniciar
+    renderQuestion(questions, currentQuestion);
+  </script>
+</body>
+</html>
+
