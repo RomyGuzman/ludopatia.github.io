@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encuesta Nivel Secundario</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+        }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #444;
+        }
+        .option {
+            display: block;
+            margin: 10px 0;
+            padding: 14px;
+            border: 2px solid #2575fc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            position: relative;
+            user-select: none;
+        }
+        .option:hover {
+            background: #2575fc;
+            color: white;
+        }
+        .option.selected {
+            background: #2575fc !important;
+            color: #fff !important;
+            border-color: #2575fc !important;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            display: none;
+        }
+        input[type="radio"],
+        input[type="checkbox"] {
+            display: none;
+        }
+        button {
+            margin-top: 15px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+            color: white;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+        .back-btn {
+            background: #ddd !important;
+            color: #333 !important;
+            margin-right: 10px;
+        }
+        .back-btn:hover {
+            background: #ccc !important;
+            transform: scale(1.02);
+        }
+        .progress-bar {
+            height: 8px;
+            background: #ddd;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress {
+            height: 8px;
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
+            width: 0;
+            transition: width 0.4s ease;
+        }
+        .spinner {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .spinner div {
+            width: 16px;
+            height: 16px;
+            margin: 0 4px;
+            background: #2575fc;
+            border-radius: 50%;
+            animation: bounce 0.6s infinite alternate;
+        }
+        .spinner div:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .spinner div:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes bounce {
+            to {
+                transform: translateY(-12px);
+                opacity: 0.7;
+            }
+        }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .button-group button {
+            flex: 1;
+            margin: 0 5px;
+        }
+        .final-message {
+            text-align: center;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        .final-message a {
+            color: #2575fc;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ENCUESTA</h1>
+        <div style="text-align:right; margin-bottom:10px;">
+            <label for="lang">Idioma:</label>
+            <select id="lang" onchange="cambiarIdioma(this.value)">
+                <option value="es">Español</option>
+                <option value="en">English</option>
+                <option value="zh">中文</option>
+            </select>
+        </div>
+        <div class="progress-bar"><div id="progress" class="progress"></div></div>
+        <div id="quiz"></div>
+    </div>
+    <script>
+        // Preguntas adaptadas y cerradas, con "Otro" para completar
+        const questions = [
+            { pregunta: "1. Edad: seleccionar rango", tipo: "opcion", opciones: ["12 – 13", "14 – 15", "16 – 17"] },
+            { pregunta: "2. Género", tipo: "opcion", opciones: ["Femenino", "Masculino", "Otro"] },
+            { pregunta: "3. ¿Has apostado en línea alguna vez?", tipo: "opcion", opciones: ["Sí", "No"] },
+            { pregunta: "4. ¿Con qué frecuencia sueles apostar?", tipo: "opcion", opciones: ["Todos los días", "1 a 2 días por semana", "3 a 5 días por semana", "6 a 7 dias por semana"] },
+            { pregunta: "5. ¿Cuántas horas en dedicas a apostar en un día cuando jugas?", tipo: "opcion", opciones: ["Menos de 1 hora", "1 a 2 horas", "Más de 3 horas"] },
+            { pregunta: "6. ¿Qué días de la semana sueles apostar?", tipo: "multiple", opciones: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"] },
+            { pregunta: "7. ¿En qué tipo de actividades apuestas?", tipo: "multiple", opciones: ["Casino online", "Apuestas deportivas", "Póker u otros juegos de cartas", "Juegos de azar (ruleta, tragamonedas, etc.)", "Otro"] },
+            { pregunta: "8. ¿Los sitios de apuestas en los que juegas son oficiales (.bet)?", tipo: "opcion", opciones: ["Si", "No", "No sé"] },
+            { pregunta: "9. ¿De dónde obtienes el dinero para apostar?", tipo: "opcion", opciones: ["Un familiar", "Trabajo", "Becas", "Otros"] },
+            { pregunta: "10. ¿Cuánto dinero sueles apostar en una semana?", tipo: "opcion", opciones: ["Entre $1.000 y $5.000", "Entre $5.000 y $10.000", "Más de $10.000"] },
+            { pregunta: "11. ¿Tus padres o tutores saben que apuestas?", tipo: "opcion", opciones: ["Sí", "No", "No estoy seguro"] },
+            { pregunta: "12. ¿Cómo conociste los juegos en línea?", tipo: "opcion", opciones: ["Redes sociales", "Amigos", "Familia", "Otro"] },
+            { pregunta: "13. ¿Por qué apuestas?", tipo: "multiple", opciones: ["Diversión o entretenimiento", "Para ganar dinero", "Porque mis amigos lo hacen", "Otro"] },
+            { pregunta: "14. ¿Conoces los riesgos de apostar?", tipo: "opcion", opciones: ["Si", "No"] },
+            { pregunta: "15. ¿Sabes a dónde acudir o qué hacer si tuvieras un problema con las apuestas?", tipo: "opcion", opciones: ["Sí", "No"] },
+            { pregunta: "16. ¿Te interesaría recibir información al respecto?", tipo: "opcion", opciones: ["Si", "No"] },
+            // Si no apuestan
+            { pregunta: "17. ¿Conoces a alguien que apueste en línea?", tipo: "opcion", opciones: ["Sí", "No"] },
+            { pregunta: "18. ¿Alguna vez alguien te recomendó apostar?", tipo: "opcion", opciones: ["Sí", "No"] },
+            { pregunta: "19. ¿Te gustaría apostar alguna vez?", tipo: "opcion", opciones: ["Sí", "No", "No estoy seguro"] },
+            { pregunta: "20. ¿Conoces los riesgos de apostar?", tipo: "opcion", opciones: ["Sí", "No", "Un poco"] },
+            { pregunta: "21. ¿Sabes a dónde acudir o qué hacer si tuvieras un problema con las apuestas?", tipo: "opcion", opciones: ["Sí", "No"] },
+            { pregunta: "22. ¿Has visto publicidad de apuestas online en redes sociales o internet?", tipo: "opcion", opciones: ["Sí, muchas veces", "Algunas veces", "Nunca"] },
+            { pregunta: "23. ¿Alguna vez gastaste dinero en un juego (ejemplo: para conseguir monedas, vidas o recompensas)?", tipo: "opcion", opciones: ["Sí", "No"] }
+        ];
+
+        let currentQuestion = 0;
+        let answers = {};
+        let idioma = "es";
+
+        function cambiarIdioma(lang) {
+            idioma = lang;
+            renderQuestion();
+        }
+
+        function updateProgress() {
+            let percent = ((currentQuestion) / questions.length) * 100;
+            document.getElementById("progress").style.width = percent + "%";
+        }
+
+        function renderQuestion() {
+            // Salto de lógica: si pregunta 3 es "No", saltar a 17
+            if (currentQuestion === 3 && answers[3] === "No") {
+                currentQuestion = 16;
+            }
+            if (currentQuestion >= questions.length) {
+                mostrarFinal();
+                return;
+            }
+            updateProgress();
+            let q = questions[currentQuestion];
+            let html = `<h2>${q.pregunta}</h2>`;
+
+            // Opciones únicas
+            if (q.tipo === "opcion") {
+                q.opciones.forEach((opt, i) => {
+                    let isOtro = opt.toLowerCase().includes("otro");
+                    html += `<div class="option" onclick="seleccionarOpcion(${currentQuestion}, ${i}, ${isOtro})" id="option_${currentQuestion}_${i}">
+                        <label>${opt}</label>
+                        ${isOtro ? `<input type="text" id="otroInput${currentQuestion}" style="display:none;" placeholder="Escribe tu respuesta">` : ""}
+                    </div>`;
+                });
+                html += `<div class="button-group">
+                    ${currentQuestion > 0 ? `<button class="back-btn" onclick="volverAtras()">Atrás</button>` : ""}
+                    <button onclick="nextObligatoria()">Siguiente</button>
+                </div>`;
+            }
+            // Opciones múltiples
+            else if (q.tipo === "multiple") {
+                q.opciones.forEach((opt, i) => {
+                    let isOtro = opt.toLowerCase().includes("otro");
+                    html += `<div class="option" onclick="seleccionarMultiple(${currentQuestion}, ${i}, ${isOtro})" id="option_${currentQuestion}_${i}">
+                        <label>${opt}</label>
+                        ${isOtro ? `<input type="text" id="otroInput${currentQuestion}" style="display:none;" placeholder="Escribe tu respuesta">` : ""}
+                    </div>`;
+                });
+                html += `<div class="button-group">
+                    <button class="back-btn" onclick="volverAtras()">Atrás</button>
+                    <button onclick="nextMultipleObligatoria()">Siguiente</button>
+                </div>`;
+            }
+            document.getElementById("quiz").innerHTML = html;
+            marcarSeleccion();
+        }
+
+        // Selección opción única
+        function seleccionarOpcion(qIdx, optIdx, isOtro) {
+            // Quitar selección previa
+            document.querySelectorAll(`[id^="option_${qIdx}_"]`).forEach(el => el.classList.remove('selected'));
+            document.getElementById(`option_${qIdx}_${optIdx}`).classList.add('selected');
+            let opt = questions[qIdx].opciones[optIdx];
+            answers[qIdx + 1] = opt;
+            // Mostrar input "Otro"
+            let otroInput = document.getElementById(`otroInput${qIdx}`);
+            if (otroInput) otroInput.style.display = isOtro ? "block" : "none";
+        }
+
+        // Selección opción múltiple
+        function seleccionarMultiple(qIdx, optIdx, isOtro) {
+            let el = document.getElementById(`option_${qIdx}_${optIdx}`);
+            el.classList.toggle('selected');
+            let opt = questions[qIdx].opciones[optIdx];
+            if (!answers[qIdx + 1]) answers[qIdx + 1] = [];
+            let arr = answers[qIdx + 1];
+            if (el.classList.contains('selected')) {
+                arr.push(opt);
+            } else {
+                let idx = arr.indexOf(opt);
+                if (idx > -1) arr.splice(idx, 1);
+            }
+            // Mostrar input "Otro"
+            let otroInput = document.getElementById(`otroInput${qIdx}`);
+            if (otroInput) otroInput.style.display = isOtro && el.classList.contains('selected') ? "block" : "none";
+        }
+
+        // Validación y avance opción única
+        function nextObligatoria() {
+            let q = questions[currentQuestion];
+            let seleccion = answers[currentQuestion + 1];
+            if (!seleccion) {
+                alert("Por favor selecciona una opción");
+                return;
+            }
+            // Si es "Otro", validar texto
+            if (seleccion.toLowerCase().includes("otro")) {
+                let val = document.getElementById(`otroInput${currentQuestion}`).value.trim();
+                if (!val) {
+                    alert("Por favor escribe tu respuesta");
+                    return;
+                }
+                answers[currentQuestion + 1] = val;
+            }
+            currentQuestion++;
+            renderQuestion();
+        }
+
+        // Validación y avance opción múltiple
+        function nextMultipleObligatoria() {
+            let arr = answers[currentQuestion + 1];
+            if (!arr || arr.length === 0) {
+                alert("Selecciona al menos una opción");
+                return;
+            }
+            // Si incluye "Otro", validar texto
+            let tieneOtro = arr.some(v => v.toLowerCase().includes("otro"));
+            if (tieneOtro) {
+                let val = document.getElementById(`otroInput${currentQuestion}`).value.trim();
+                if (!val) {
+                    alert("Por favor escribe tu respuesta");
+                    return;
+                }
+                answers[currentQuestion + 1] = arr.map(v => v.toLowerCase().includes("otro") ? val : v);
+            }
+            currentQuestion++;
+            renderQuestion();
+        }
+
+        // Marcar selección visual
+        function marcarSeleccion() {
+            let q = questions[currentQuestion];
+            let val = answers[currentQuestion + 1];
+            if (q.tipo === "opcion" && val) {
+                q.opciones.forEach((opt, i) => {
+                    let el = document.getElementById(`option_${currentQuestion}_${i}`);
+                    if (val === opt || (opt.toLowerCase().includes("otro") && typeof val === "string" && !q.opciones.includes(val))) {
+                        el.classList.add('selected');
+                        let otroInput = document.getElementById(`otroInput${currentQuestion}`);
+                        if (otroInput) otroInput.style.display = opt.toLowerCase().includes("otro") ? "block" : "none";
+                    }
+                });
+            }
+            if (q.tipo === "multiple" && val) {
+                q.opciones.forEach((opt, i) => {
+                    let el = document.getElementById(`option_${currentQuestion}_${i}`);
+                    if (val.includes(opt) || (opt.toLowerCase().includes("otro") && val.some(v => !q.opciones.includes(v)))) {
+                        el.classList.add('selected');
+                        let otroInput = document.getElementById(`otroInput${currentQuestion}`);
+                        if (otroInput) otroInput.style.display = opt.toLowerCase().includes("otro") ? "block" : "none";
+                    }
+                });
+            }
+        }
+
+        // Volver atrás
+        function volverAtras() {
+            // Si estaba en pregunta 17 por salto, volver a 3
+            if (currentQuestion === 16 && answers[3] === "No") {
+                currentQuestion = 3;
+            } else {
+                currentQuestion = Math.max(0, currentQuestion - 1);
+            }
+            renderQuestion();
+        }
+
+        // Mensaje final
+        function mostrarFinal() {
+            document.getElementById("quiz").innerHTML = `
+                <h2>Gracias por responder esta encuesta</h2>
+                <div class="final-message">
+                    <p>Si querés o necesitás más información sobre el tema podés:</p>
+                    <ul style="text-align:left;">
+                        <li>Ingresar a <a href="https://www.argentina.gob.ar/salud/mental" target="_blank">página oficial</a></li>
+                        <li>Llamar al <b>tel de ayuda municipal</b></li>
+                        <li>Tel de ayuda nacional</li>
+                        <li>Dirigirte a <b>centro de adicciones de 30 de mayo</b></li>
+                        <li>Consultar opciones en Chascomús</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        // Iniciar
+        renderQuestion();
+    </script>
+</body>
+</html>
