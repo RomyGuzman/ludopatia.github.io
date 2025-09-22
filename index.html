@@ -177,7 +177,60 @@
         <div id="quiz"></div>
     </div>
     <script>
-        // Preguntas adaptadas y cerradas, con "Otro" para completar
+        // Traducciones de preguntas y opciones
+        const traducciones = {
+            en: [
+                { pregunta: "1. Age: select range", opciones: ["12 – 13", "14 – 15", "16 – 17"] },
+                { pregunta: "2. Gender", opciones: ["Female", "Male", "Other"] },
+                { pregunta: "3. Have you ever bet online?", opciones: ["Yes", "No"] },
+                { pregunta: "4. How often do you usually bet?", opciones: ["Every day", "1 to 2 days per week", "3 to 5 days per week", "6 to 7 days per week"] },
+                { pregunta: "5. How many hours do you spend betting on a day you play?", opciones: ["Less than 1 hour", "1 to 2 hours", "More than 3 hours"] },
+                { pregunta: "6. Which days of the week do you usually bet?", opciones: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] },
+                { pregunta: "7. What type of activities do you bet on?", opciones: ["Online casino", "Sports betting", "Poker or other card games", "Games of chance (roulette, slots, etc.)", "Other"] },
+                { pregunta: "8. Are the betting sites you play on official (.bet)?", opciones: ["Yes", "No", "I don't know"] },
+                { pregunta: "9. Where do you get the money to bet?", opciones: ["A relative", "Work", "Scholarships", "Others"] },
+                { pregunta: "10. How much money do you usually bet in a week?", opciones: ["Between $1,000 and $5,000", "Between $5,000 and $10,000", "More than $10,000"] },
+                { pregunta: "11. Do your parents or guardians know you bet?", opciones: ["Yes", "No", "I'm not sure"] },
+                { pregunta: "12. How did you learn about online games?", opciones: ["Social networks", "Friends", "Family", "Other"] },
+                { pregunta: "13. Why do you bet?", opciones: ["Fun or entertainment", "To earn money", "Because my friends do it", "Other"] },
+                { pregunta: "14. Do you know the risks of betting?", opciones: ["Yes", "No"] },
+                { pregunta: "15. Do you know where to go or what to do if you had a problem with betting?", opciones: ["Yes", "No"] },
+                { pregunta: "16. Would you like to receive information about it?", opciones: ["Yes", "No"] },
+                { pregunta: "17. Do you know someone who bets online?", opciones: ["Yes", "No"] },
+                { pregunta: "18. Has anyone ever recommended you to bet?", opciones: ["Yes", "No"] },
+                { pregunta: "19. Would you like to bet someday?", opciones: ["Yes", "No", "I'm not sure"] },
+                { pregunta: "20. Do you know the risks of betting?", opciones: ["Yes", "No", "A little"] },
+                { pregunta: "21. Do you know where to go or what to do if you had a problem with betting?", opciones: ["Yes", "No"] },
+                { pregunta: "22. Have you seen online betting ads on social networks or the internet?", opciones: ["Yes, many times", "Sometimes", "Never"] },
+                { pregunta: "23. Have you ever spent money on a game (e.g., to get coins, lives or rewards)?", opciones: ["Yes", "No"] }
+            ],
+            zh: [
+                { pregunta: "1. 年龄：请选择范围", opciones: ["12 – 13", "14 – 15", "16 – 17"] },
+                { pregunta: "2. 性别", opciones: ["女性", "男性", "其他"] },
+                { pregunta: "3. 你曾经在线上赌博过吗？", opciones: ["是", "否"] },
+                { pregunta: "4. 你通常多久赌博一次？", opciones: ["每天", "每周1-2天", "每周3-5天", "每周6-7天"] },
+                { pregunta: "5. 你在赌博的那天平均花多少小时？", opciones: ["少于1小时", "1到2小时", "超过3小时"] },
+                { pregunta: "6. 你通常在哪些星期几赌博？", opciones: ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"] },
+                { pregunta: "7. 你参与哪些类型的赌博活动？", opciones: ["在线赌场", "体育博彩", "扑克或其他纸牌游戏", "机会游戏（轮盘、老虎机等）", "其他"] },
+                { pregunta: "8. 你玩的赌博网站是官方的吗（.bet）？", opciones: ["是", "否", "不知道"] },
+                { pregunta: "9. 你从哪里获得赌博资金？", opciones: ["亲属", "工作", "奖学金", "其他"] },
+                { pregunta: "10. 你一周通常赌博多少钱？", opciones: ["$1,000-$5,000", "$5,000-$10,000", "超过$10,000"] },
+                { pregunta: "11. 你的父母或监护人知道你赌博吗？", opciones: ["是", "否", "不确定"] },
+                { pregunta: "12. 你是如何了解线上游戏的？", opciones: ["社交网络", "朋友", "家庭", "其他"] },
+                { pregunta: "13. 你为什么赌博？", opciones: ["娱乐", "赚钱", "因为朋友也赌博", "其他"] },
+                { pregunta: "14. 你知道赌博的风险吗？", opciones: ["是", "否"] },
+                { pregunta: "15. 如果你在赌博中遇到问题，你知道该去哪里或该怎么办吗？", opciones: ["是", "否"] },
+                { pregunta: "16. 你想收到相关信息吗？", opciones: ["是", "否"] },
+                { pregunta: "17. 你认识有人在线赌博吗？", opciones: ["是", "否"] },
+                { pregunta: "18. 有人曾经推荐你赌博吗？", opciones: ["是", "否"] },
+                { pregunta: "19. 你想过有一天去赌博吗？", opciones: ["是", "否", "不确定"] },
+                { pregunta: "20. 你知道赌博的风险吗？", opciones: ["是", "否", "有一点"] },
+                { pregunta: "21. 如果你在赌博中遇到问题，你知道该去哪里或该怎么办吗？", opciones: ["是", "否"] },
+                { pregunta: "22. 你在社交网络或互联网上见过线上赌博广告吗？", opciones: ["是，经常", "有时", "从未"] },
+                { pregunta: "23. 你曾经在游戏中花钱吗（例如：购买金币、生命或奖励）？", opciones: ["是", "否"] }
+            ]
+        };
+
         const questions = [
             { pregunta: "1. Edad: seleccionar rango", tipo: "opcion", opciones: ["12 – 13", "14 – 15", "16 – 17"] },
             { pregunta: "2. Género", tipo: "opcion", opciones: ["Femenino", "Masculino", "Otro"] },
@@ -221,7 +274,7 @@
 
         function renderQuestion() {
             // Salto de lógica: si pregunta 3 es "No", saltar a 17
-            if (currentQuestion === 3 && answers[3] === "No") {
+            if (currentQuestion === 3 && answers[3] === (idioma === "es" ? "No" : idioma === "en" ? "No" : "否")) {
                 currentQuestion = 16;
             }
             if (currentQuestion >= questions.length) {
@@ -230,34 +283,35 @@
             }
             updateProgress();
             let q = questions[currentQuestion];
-            let html = `<h2>${q.pregunta}</h2>`;
+            let qTrad = idioma === "es" ? q : traducciones[idioma][currentQuestion];
+            let html = `<h2>${qTrad.pregunta}</h2>`;
 
             // Opciones únicas
             if (q.tipo === "opcion") {
-                q.opciones.forEach((opt, i) => {
-                    let isOtro = opt.toLowerCase().includes("otro");
+                qTrad.opciones.forEach((opt, i) => {
+                    let isOtro = opt.toLowerCase() === "otro" || opt.toLowerCase() === "other" || opt === "其他";
                     html += `<div class="option" onclick="seleccionarOpcion(${currentQuestion}, ${i}, ${isOtro})" id="option_${currentQuestion}_${i}">
                         <label>${opt}</label>
-                        ${isOtro ? `<input type="text" id="otroInput${currentQuestion}" style="display:none;" placeholder="Escribe tu respuesta">` : ""}
+                        ${isOtro ? `<input type="text" id="otroInput${currentQuestion}" style="display:none;" placeholder="${idioma === "zh" ? "请输入你的答案" : idioma === "en" ? "Type your answer" : "Escribe tu respuesta"}">` : ""}
                     </div>`;
                 });
                 html += `<div class="button-group">
-                    ${currentQuestion > 0 ? `<button class="back-btn" onclick="volverAtras()">Atrás</button>` : ""}
-                    <button onclick="nextObligatoria()">Siguiente</button>
+                    ${currentQuestion > 0 ? `<button class="back-btn" onclick="volverAtras()">${idioma === "zh" ? "返回" : idioma === "en" ? "Back" : "Atrás"}</button>` : ""}
+                    <button onclick="nextObligatoria()">${idioma === "zh" ? "下一步" : idioma === "en" ? "Next" : "Siguiente"}</button>
                 </div>`;
             }
             // Opciones múltiples
             else if (q.tipo === "multiple") {
-                q.opciones.forEach((opt, i) => {
-                    let isOtro = opt.toLowerCase().includes("otro");
+                qTrad.opciones.forEach((opt, i) => {
+                    let isOtro = opt.toLowerCase() === "otro" || opt.toLowerCase() === "other" || opt === "其他";
                     html += `<div class="option" onclick="seleccionarMultiple(${currentQuestion}, ${i}, ${isOtro})" id="option_${currentQuestion}_${i}">
                         <label>${opt}</label>
-                        ${isOtro ? `<input type="text" id="otroInput${currentQuestion}" style="display:none;" placeholder="Escribe tu respuesta">` : ""}
+                        ${isOtro ? `<input type="text" id="otroInput${currentQuestion}" style="display:none;" placeholder="${idioma === "zh" ? "请输入你的答案" : idioma === "en" ? "Type your answer" : "Escribe tu respuesta"}">` : ""}
                     </div>`;
                 });
                 html += `<div class="button-group">
-                    <button class="back-btn" onclick="volverAtras()">Atrás</button>
-                    <button onclick="nextMultipleObligatoria()">Siguiente</button>
+                    <button class="back-btn" onclick="volverAtras()">${idioma === "zh" ? "返回" : idioma === "en" ? "Back" : "Atrás"}</button>
+                    <button onclick="nextMultipleObligatoria()">${idioma === "zh" ? "下一步" : idioma === "en" ? "Next" : "Siguiente"}</button>
                 </div>`;
             }
             document.getElementById("quiz").innerHTML = html;
@@ -266,12 +320,10 @@
 
         // Selección opción única
         function seleccionarOpcion(qIdx, optIdx, isOtro) {
-            // Quitar selección previa
             document.querySelectorAll(`[id^="option_${qIdx}_"]`).forEach(el => el.classList.remove('selected'));
             document.getElementById(`option_${qIdx}_${optIdx}`).classList.add('selected');
-            let opt = questions[qIdx].opciones[optIdx];
+            let opt = (idioma === "es" ? questions[qIdx].opciones[optIdx] : traducciones[idioma][qIdx].opciones[optIdx]);
             answers[qIdx + 1] = opt;
-            // Mostrar input "Otro"
             let otroInput = document.getElementById(`otroInput${qIdx}`);
             if (otroInput) otroInput.style.display = isOtro ? "block" : "none";
         }
@@ -280,7 +332,7 @@
         function seleccionarMultiple(qIdx, optIdx, isOtro) {
             let el = document.getElementById(`option_${qIdx}_${optIdx}`);
             el.classList.toggle('selected');
-            let opt = questions[qIdx].opciones[optIdx];
+            let opt = (idioma === "es" ? questions[qIdx].opciones[optIdx] : traducciones[idioma][qIdx].opciones[optIdx]);
             if (!answers[qIdx + 1]) answers[qIdx + 1] = [];
             let arr = answers[qIdx + 1];
             if (el.classList.contains('selected')) {
@@ -289,24 +341,22 @@
                 let idx = arr.indexOf(opt);
                 if (idx > -1) arr.splice(idx, 1);
             }
-            // Mostrar input "Otro"
             let otroInput = document.getElementById(`otroInput${qIdx}`);
             if (otroInput) otroInput.style.display = isOtro && el.classList.contains('selected') ? "block" : "none";
         }
 
         // Validación y avance opción única
         function nextObligatoria() {
-            let q = questions[currentQuestion];
+            let q = idioma === "es" ? questions[currentQuestion] : traducciones[idioma][currentQuestion];
             let seleccion = answers[currentQuestion + 1];
             if (!seleccion) {
-                alert("Por favor selecciona una opción");
+                alert(idioma === "zh" ? "请选择一个选项" : idioma === "en" ? "Please select an option" : "Por favor selecciona una opción");
                 return;
             }
-            // Si es "Otro", validar texto
-            if (seleccion.toLowerCase().includes("otro")) {
+            if (seleccion.toLowerCase() === "otro" || seleccion.toLowerCase() === "other" || seleccion === "其他") {
                 let val = document.getElementById(`otroInput${currentQuestion}`).value.trim();
                 if (!val) {
-                    alert("Por favor escribe tu respuesta");
+                    alert(idioma === "zh" ? "请输入你的答案" : idioma === "en" ? "Please enter your answer" : "Por favor escribe tu respuesta");
                     return;
                 }
                 answers[currentQuestion + 1] = val;
@@ -319,18 +369,17 @@
         function nextMultipleObligatoria() {
             let arr = answers[currentQuestion + 1];
             if (!arr || arr.length === 0) {
-                alert("Selecciona al menos una opción");
+                alert(idioma === "zh" ? "请选择至少一个选项" : idioma === "en" ? "Please select at least one option" : "Selecciona al menos una opción");
                 return;
             }
-            // Si incluye "Otro", validar texto
-            let tieneOtro = arr.some(v => v.toLowerCase().includes("otro"));
+            let tieneOtro = arr.some(v => v.toLowerCase() === "otro" || v.toLowerCase() === "other" || v === "其他");
             if (tieneOtro) {
                 let val = document.getElementById(`otroInput${currentQuestion}`).value.trim();
                 if (!val) {
-                    alert("Por favor escribe tu respuesta");
+                    alert(idioma === "zh" ? "请输入你的答案" : idioma === "en" ? "Please enter your answer" : "Por favor escribe tu respuesta");
                     return;
                 }
-                answers[currentQuestion + 1] = arr.map(v => v.toLowerCase().includes("otro") ? val : v);
+                answers[currentQuestion + 1] = arr.map(v => (v.toLowerCase() === "otro" || v.toLowerCase() === "other" || v === "其他") ? val : v);
             }
             currentQuestion++;
             renderQuestion();
@@ -338,25 +387,25 @@
 
         // Marcar selección visual
         function marcarSeleccion() {
-            let q = questions[currentQuestion];
+            let q = idioma === "es" ? questions[currentQuestion] : traducciones[idioma][currentQuestion];
             let val = answers[currentQuestion + 1];
             if (q.tipo === "opcion" && val) {
                 q.opciones.forEach((opt, i) => {
                     let el = document.getElementById(`option_${currentQuestion}_${i}`);
-                    if (val === opt || (opt.toLowerCase().includes("otro") && typeof val === "string" && !q.opciones.includes(val))) {
+                    if (val === opt || (opt.toLowerCase() === "otro" || opt.toLowerCase() === "other" || opt === "其他") && typeof val === "string" && !q.opciones.includes(val)) {
                         el.classList.add('selected');
                         let otroInput = document.getElementById(`otroInput${currentQuestion}`);
-                        if (otroInput) otroInput.style.display = opt.toLowerCase().includes("otro") ? "block" : "none";
+                        if (otroInput) otroInput.style.display = (opt.toLowerCase() === "otro" || opt.toLowerCase() === "other" || opt === "其他") ? "block" : "none";
                     }
                 });
             }
             if (q.tipo === "multiple" && val) {
                 q.opciones.forEach((opt, i) => {
                     let el = document.getElementById(`option_${currentQuestion}_${i}`);
-                    if (val.includes(opt) || (opt.toLowerCase().includes("otro") && val.some(v => !q.opciones.includes(v)))) {
+                    if (val.includes(opt) || ((opt.toLowerCase() === "otro" || opt.toLowerCase() === "other" || opt === "其他") && val.some(v => !q.opciones.includes(v)))) {
                         el.classList.add('selected');
                         let otroInput = document.getElementById(`otroInput${currentQuestion}`);
-                        if (otroInput) otroInput.style.display = opt.toLowerCase().includes("otro") ? "block" : "none";
+                        if (otroInput) otroInput.style.display = (opt.toLowerCase() === "otro" || opt.toLowerCase() === "other" || opt === "其他") ? "block" : "none";
                     }
                 });
             }
@@ -364,8 +413,7 @@
 
         // Volver atrás
         function volverAtras() {
-            // Si estaba en pregunta 17 por salto, volver a 3
-            if (currentQuestion === 16 && answers[3] === "No") {
+            if (currentQuestion === 16 && (answers[3] === "No" || answers[3] === "否" || answers[3] === "No")) {
                 currentQuestion = 3;
             } else {
                 currentQuestion = Math.max(0, currentQuestion - 1);
@@ -373,21 +421,50 @@
             renderQuestion();
         }
 
-        // Mensaje final
+        // Mensaje final traducido
         function mostrarFinal() {
-            document.getElementById("quiz").innerHTML = `
-                <h2>Gracias por responder esta encuesta</h2>
-                <div class="final-message">
-                    <p>Si querés o necesitás más información sobre el tema podés:</p>
-                    <ul style="text-align:left;">
-                        <li>Ingresar a <a href="https://www.argentina.gob.ar/salud/mental" target="_blank">página oficial</a></li>
-                        <li>Llamar al <b>tel de ayuda municipal</b></li>
-                        <li>Tel de ayuda nacional</li>
-                        <li>Dirigirte a <b>centro de adicciones de 30 de mayo</b></li>
-                        <li>Consultar opciones en Chascomús</li>
-                    </ul>
-                </div>
-            `;
+            let mensajes = {
+                es: `
+                    <h2>Gracias por responder esta encuesta</h2>
+                    <div class="final-message">
+                        <p>Si querés o necesitás más información sobre el tema podés:</p>
+                        <ul style="text-align:left;">
+                            <li>Ingresar a <a href="https://www.argentina.gob.ar/salud/mental" target="_blank">página oficial</a></li>
+                            <li>Llamar al <b>tel de ayuda municipal</b></li>
+                            <li>Tel de ayuda nacional</li>
+                            <li>Dirigirte a <b>centro de adicciones de 30 de mayo</b></li>
+                            <li>Consultar opciones en Chascomús</li>
+                        </ul>
+                    </div>
+                `,
+                en: `
+                    <h2>Thank you for answering this survey</h2>
+                    <div class="final-message">
+                        <p>If you want or need more information about the topic you can:</p>
+                        <ul style="text-align:left;">
+                            <li>Visit the <a href="https://www.argentina.gob.ar/salud/mental" target="_blank">official website</a></li>
+                            <li>Call the <b>municipal help line</b></li>
+                            <li>National help line</li>
+                            <li>Go to the <b>addiction center in 30 de Mayo</b></li>
+                            <li>Check options in Chascomús</li>
+                        </ul>
+                    </div>
+                `,
+                zh: `
+                    <h2>感谢您参与本次调查</h2>
+                    <div class="final-message">
+                        <p>如需更多信息，请：</p>
+                        <ul style="text-align:left;">
+                            <li>访问 <a href="https://www.argentina.gob.ar/salud/mental" target="_blank">官方网站</a></li>
+                            <li>拨打<b>市政帮助热线</b></li>
+                            <li>国家帮助热线</li>
+                            <li>前往 <b>30 de Mayo 成瘾中心</b></li>
+                            <li>咨询 Chascomús 的相关选项</li>
+                        </ul>
+                    </div>
+                `
+            };
+            document.getElementById("quiz").innerHTML = mensajes[idioma];
         }
 
         // Iniciar
