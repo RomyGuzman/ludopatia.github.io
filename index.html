@@ -233,18 +233,18 @@
 
         const questions = [
             { pregunta: "1. Edad: seleccionar rango", tipo: "opcion", opciones: ["12 – 13", "14 – 15", "16 – 17"] },
-            { pregunta: "2. Género", tipo: "opcion", opciones: ["Femenino", "Masculino", "Otro"] },
+            { pregunta: "2. Género", tipo: "opcion", opciones: ["Femenino", "Masculino", "Otro"] }, // "Otro" sin campo de texto
             { pregunta: "3. ¿Has apostado en línea alguna vez?", tipo: "opcion", opciones: ["Sí", "No"] },
-            { pregunta: "4. ¿Con qué frecuencia sueles apostar?", tipo: "opcion", opciones: ["Todos los días", "1 a 2 días por semana", "3 a 5 días por semana", "6 a 7 dias por semana"] },
-            { pregunta: "5. ¿Cuántas horas en dedicas a apostar en un día cuando jugas?", tipo: "opcion", opciones: ["Menos de 1 hora", "1 a 2 horas", "Más de 3 horas"] },
+            { pregunta: "4. ¿Con qué frecuencia sueles apostar?", tipo: "opcion", opciones: ["1 a 2 días por semana", "3 a 5 días por semana", "6 a 7 días por semana"] }, // "Todos los días" eliminado
+            { pregunta: "5. ¿Cuántas horas apostás por día?", tipo: "opcion", opciones: ["Menos de 1 hora", "1 a 2 horas", "Más de 3 horas"] }, // texto cambiado
             { pregunta: "6. ¿Qué días de la semana sueles apostar?", tipo: "multiple", opciones: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"] },
-            { pregunta: "7. ¿En qué tipo de actividades apuestas?", tipo: "multiple", opciones: ["Casino online", "Apuestas deportivas", "Póker u otros juegos de cartas", "Juegos de azar (ruleta, tragamonedas, etc.)", "Otro"] },
+            { pregunta: "7. ¿En qué tipo de actividades apuestas?", tipo: "multiple", opciones: ["Casino online", "Apuestas deportivas", "Póker u otros juegos de cartas", "Juegos de azar (ruleta, tragamonedas, etc.)", "Otro"] }, // "Otro" sin campo de texto
             { pregunta: "8. ¿Los sitios de apuestas en los que juegas son oficiales (.bet)?", tipo: "opcion", opciones: ["Si", "No", "No sé"] },
-            { pregunta: "9. ¿De dónde obtienes el dinero para apostar?", tipo: "opcion", opciones: ["Un familiar", "Trabajo", "Becas", "Otros"] },
+            { pregunta: "9. ¿De dónde obtienes el dinero para apostar?", tipo: "multiple", opciones: ["Un familiar", "Trabajo", "Becas", "Otros"] }, // multiple y "Otros" sin campo de texto
             { pregunta: "10. ¿Cuánto dinero sueles apostar en una semana?", tipo: "opcion", opciones: ["Entre $1.000 y $5.000", "Entre $5.000 y $10.000", "Más de $10.000"] },
             { pregunta: "11. ¿Tus padres o tutores saben que apuestas?", tipo: "opcion", opciones: ["Sí", "No", "No estoy seguro"] },
-            { pregunta: "12. ¿Cómo conociste los juegos en línea?", tipo: "opcion", opciones: ["Redes sociales", "Amigos", "Familia", "Otro"] },
-            { pregunta: "13. ¿Por qué apuestas?", tipo: "multiple", opciones: ["Diversión o entretenimiento", "Para ganar dinero", "Porque mis amigos lo hacen", "Otro"] },
+            { pregunta: "12. ¿Cómo conociste los juegos en línea?", tipo: "multiple", opciones: ["Redes sociales", "Amigos", "Familia", "Otro"] }, // multiple y "Otro" sin campo de texto
+            { pregunta: "13. ¿Por qué apuestas?", tipo: "multiple", opciones: ["Diversión o entretenimiento", "Para ganar dinero", "Porque mis amigos lo hacen", "Otro"] }, // "Otro" sin campo de texto
             { pregunta: "14. ¿Conoces los riesgos de apostar?", tipo: "opcion", opciones: ["Si", "No"] },
             { pregunta: "15. ¿Sabes a dónde acudir o qué hacer si tuvieras un problema con las apuestas?", tipo: "opcion", opciones: ["Sí", "No"] },
             { pregunta: "16. ¿Te interesaría recibir información al respecto?", tipo: "opcion", opciones: ["Si", "No"] },
@@ -277,6 +277,11 @@
             if (currentQuestion === 3 && answers[3] === (idioma === "es" ? "No" : idioma === "en" ? "No" : "否")) {
                 currentQuestion = 16;
             }
+            // Si pregunta 3 es "Sí" y llega a la 16, mostrar final
+            if (answers[3] === (idioma === "es" ? "Sí" : idioma === "en" ? "Yes" : "是") && currentQuestion === 16) {
+                mostrarFinal();
+                return;
+            }
             if (currentQuestion >= questions.length) {
                 mostrarFinal();
                 return;
@@ -284,15 +289,15 @@
             updateProgress();
             let q = questions[currentQuestion];
             let qTrad = idioma === "es" ? q : traducciones[idioma][currentQuestion];
-            let html = `<h2>${qTrad.pregunta}</h2>`;
+            // Elimina el número de la pregunta para mostrar solo el texto
+            let preguntaSinNumero = qTrad.pregunta.replace(/^\d+\.\s*/, "");
+            let html = `<h2>${preguntaSinNumero}</h2>`;
 
             // Opciones únicas
             if (q.tipo === "opcion") {
                 qTrad.opciones.forEach((opt, i) => {
-                    let isOtro = opt.toLowerCase() === "otro" || opt.toLowerCase() === "other" || opt === "其他";
-                    html += `<div class="option" onclick="seleccionarOpcion(${currentQuestion}, ${i}, ${isOtro})" id="option_${currentQuestion}_${i}">
+                    html += `<div class="option" onclick="seleccionarOpcion(${currentQuestion}, ${i}, false)" id="option_${currentQuestion}_${i}">
                         <label>${opt}</label>
-                        ${isOtro ? `<input type="text" id="otroInput${currentQuestion}" style="display:none;" placeholder="${idioma === "zh" ? "请输入你的答案" : idioma === "en" ? "Type your answer" : "Escribe tu respuesta"}">` : ""}
                     </div>`;
                 });
                 html += `<div class="button-group">
@@ -303,10 +308,8 @@
             // Opciones múltiples
             else if (q.tipo === "multiple") {
                 qTrad.opciones.forEach((opt, i) => {
-                    let isOtro = opt.toLowerCase() === "otro" || opt.toLowerCase() === "other" || opt === "其他";
-                    html += `<div class="option" onclick="seleccionarMultiple(${currentQuestion}, ${i}, ${isOtro})" id="option_${currentQuestion}_${i}">
+                    html += `<div class="option" onclick="seleccionarMultiple(${currentQuestion}, ${i}, false)" id="option_${currentQuestion}_${i}">
                         <label>${opt}</label>
-                        ${isOtro ? `<input type="text" id="otroInput${currentQuestion}" style="display:none;" placeholder="${idioma === "zh" ? "请输入你的答案" : idioma === "en" ? "Type your answer" : "Escribe tu respuesta"}">` : ""}
                     </div>`;
                 });
                 html += `<div class="button-group">
@@ -472,3 +475,4 @@
     </script>
 </body>
 </html>
+
